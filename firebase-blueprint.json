@@ -1,0 +1,484 @@
+{
+  "entities": {
+    "UserAccount": {
+      "title": "UserAccount",
+      "description": "Private user account data and settings (PII isolated to owner and admins).",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "format": "email", "maxLength": 254 },
+        "role": { "type": "string", "enum": ["user", "admin"] },
+        "plan": { "type": "string", "enum": ["free", "plus", "pro"] },
+        "storageQuotaBytes": { "type": "number" },
+        "storageUsedBytes": { "type": "number" },
+        "aiRequestsCount": { "type": "number" },
+        "language": { "type": "string", "enum": ["ar", "en"] },
+        "theme": { "type": "string", "enum": ["dark", "light"] },
+        "privacyDefault": { "type": "string", "enum": ["public", "friends", "private"] },
+        "notifyMessages": { "type": "boolean" },
+        "notifySocial": { "type": "boolean" },
+        "isSuspended": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "role", "plan", "storageQuotaBytes", "storageUsedBytes", "createdAt"]
+    },
+    "PublicProfile": {
+      "title": "PublicProfile",
+      "description": "Publicly discoverable social profile without email or private PII.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "username": { "type": "string", "minLength": 2, "maxLength": 40, "pattern": "^[a-zA-Z0-9_\\.]+$" },
+        "bio": { "type": "string", "maxLength": 400 },
+        "avatarUrl": { "type": "string", "maxLength": 1000 },
+        "coverUrl": { "type": "string", "maxLength": 1000 },
+        "location": { "type": "string", "maxLength": 100 },
+        "website": { "type": "string", "maxLength": 250 },
+        "friendsCount": { "type": "number" },
+        "followersCount": { "type": "number" },
+        "isVerified": { "type": "boolean" },
+        "onlineStatus": { "type": "string", "enum": ["online", "offline", "away"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "displayName", "username", "createdAt"]
+    },
+    "FriendRequest": {
+      "title": "FriendRequest",
+      "description": "Pending or resolved friend request between two users.",
+      "type": "object",
+      "properties": {
+        "fromUid": { "type": "string", "maxLength": 128 },
+        "toUid": { "type": "string", "maxLength": 128 },
+        "fromName": { "type": "string", "maxLength": 80 },
+        "fromAvatar": { "type": "string", "maxLength": 1000 },
+        "status": { "type": "string", "enum": ["pending", "accepted", "rejected"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["fromUid", "toUid", "fromName", "status", "createdAt"]
+    },
+    "Friendship": {
+      "title": "Friendship",
+      "description": "Active mutual friendship record.",
+      "type": "object",
+      "properties": {
+        "uidA": { "type": "string", "maxLength": 128 },
+        "uidB": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uidA", "uidB", "createdAt"]
+    },
+    "Follow": {
+      "title": "Follow",
+      "description": "One-way user follow relationship.",
+      "type": "object",
+      "properties": {
+        "followerUid": { "type": "string", "maxLength": 128 },
+        "targetUid": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["followerUid", "targetUid", "createdAt"]
+    },
+    "Block": {
+      "title": "Block",
+      "description": "Blocked user entry owned by blockerUid.",
+      "type": "object",
+      "properties": {
+        "blockerUid": { "type": "string", "maxLength": 128 },
+        "blockedUid": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["blockerUid", "blockedUid", "createdAt"]
+    },
+    "Post": {
+      "title": "Post",
+      "description": "Social post supporting text, media gallery, PDF, polls, hashtags, location, drafts, and group/page scopes.",
+      "type": "object",
+      "properties": {
+        "authorUid": { "type": "string", "maxLength": 128 },
+        "authorName": { "type": "string", "maxLength": 80 },
+        "authorAvatar": { "type": "string", "maxLength": 1000 },
+        "content": { "type": "string", "maxLength": 5000 },
+        "backgroundStyle": { "type": "string", "maxLength": 64 },
+        "mediaUrls": { "type": "array" },
+        "mediaTypes": { "type": "array" },
+        "externalLink": { "type": "string", "maxLength": 500 },
+        "pdfName": { "type": "string", "maxLength": 200 },
+        "pdfUrl": { "type": "string", "maxLength": 1000 },
+        "pollQuestion": { "type": "string", "maxLength": 240 },
+        "pollOptions": { "type": "array" },
+        "hashtags": { "type": "array" },
+        "location": { "type": "string", "maxLength": 120 },
+        "visibility": { "type": "string", "enum": ["public", "friends", "private"] },
+        "isDraft": { "type": "boolean" },
+        "isPinned": { "type": "boolean" },
+        "commentsDisabled": { "type": "boolean" },
+        "groupId": { "type": "string", "maxLength": 128 },
+        "pageId": { "type": "string", "maxLength": 128 },
+        "likesCount": { "type": "number" },
+        "commentsCount": { "type": "number" },
+        "sharesCount": { "type": "number" },
+        "viewsCount": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["authorUid", "authorName", "content", "visibility", "isDraft", "createdAt"]
+    },
+    "Comment": {
+      "title": "Comment",
+      "description": "Comment or threaded reply on a post.",
+      "type": "object",
+      "properties": {
+        "postId": { "type": "string", "maxLength": 128 },
+        "authorUid": { "type": "string", "maxLength": 128 },
+        "authorName": { "type": "string", "maxLength": 80 },
+        "authorAvatar": { "type": "string", "maxLength": 1000 },
+        "parentCommentId": { "type": "string", "maxLength": 128 },
+        "text": { "type": "string", "maxLength": 2000 },
+        "imageUrl": { "type": "string", "maxLength": 1000 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["postId", "authorUid", "authorName", "text", "createdAt"]
+    },
+    "PostReaction": {
+      "title": "PostReaction",
+      "description": "User reaction on a post.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "type": { "type": "string", "enum": ["like", "love", "haha", "wow", "sad", "angry"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "type", "createdAt"]
+    },
+    "SavedPost": {
+      "title": "SavedPost",
+      "description": "Bookmarked post owned by userId.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "postId": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "postId", "createdAt"]
+    },
+    "Story": {
+      "title": "Story",
+      "description": "24-hour ephemeral story with media, caption, sticker, and music metadata.",
+      "type": "object",
+      "properties": {
+        "authorUid": { "type": "string", "maxLength": 128 },
+        "authorName": { "type": "string", "maxLength": 80 },
+        "authorAvatar": { "type": "string", "maxLength": 1000 },
+        "mediaUrl": { "type": "string", "maxLength": 1000 },
+        "mediaType": { "type": "string", "enum": ["image", "video"] },
+        "caption": { "type": "string", "maxLength": 400 },
+        "sticker": { "type": "string", "maxLength": 64 },
+        "musicTrack": { "type": "string", "maxLength": 120 },
+        "visibility": { "type": "string", "enum": ["public", "friends", "private"] },
+        "viewersCount": { "type": "number" },
+        "expiresAtMs": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["authorUid", "authorName", "mediaUrl", "mediaType", "visibility", "expiresAtMs", "createdAt"]
+    },
+    "StoryView": {
+      "title": "StoryView",
+      "description": "Viewer tracking record for a story.",
+      "type": "object",
+      "properties": {
+        "viewerId": { "type": "string", "maxLength": 128 },
+        "viewerName": { "type": "string", "maxLength": 80 },
+        "viewedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["viewerId", "viewerName", "viewedAt"]
+    },
+    "Reel": {
+      "title": "Reel",
+      "description": "Vertical short-form video reel.",
+      "type": "object",
+      "properties": {
+        "authorUid": { "type": "string", "maxLength": 128 },
+        "authorName": { "type": "string", "maxLength": 80 },
+        "authorAvatar": { "type": "string", "maxLength": 1000 },
+        "videoUrl": { "type": "string", "maxLength": 1000 },
+        "thumbnailUrl": { "type": "string", "maxLength": 1000 },
+        "caption": { "type": "string", "maxLength": 500 },
+        "hashtags": { "type": "array" },
+        "musicTitle": { "type": "string", "maxLength": 120 },
+        "likesCount": { "type": "number" },
+        "commentsCount": { "type": "number" },
+        "viewsCount": { "type": "number" },
+        "sharesCount": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["authorUid", "authorName", "videoUrl", "caption", "createdAt"]
+    },
+    "LiveStream": {
+      "title": "LiveStream",
+      "description": "Live WebRTC broadcast session metadata.",
+      "type": "object",
+      "properties": {
+        "hostUid": { "type": "string", "maxLength": 128 },
+        "hostName": { "type": "string", "maxLength": 80 },
+        "hostAvatar": { "type": "string", "maxLength": 1000 },
+        "title": { "type": "string", "maxLength": 200 },
+        "status": { "type": "string", "enum": ["live", "ended"] },
+        "viewersCount": { "type": "number" },
+        "recordingUrl": { "type": "string", "maxLength": 1000 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["hostUid", "hostName", "title", "status", "createdAt"]
+    },
+    "Group": {
+      "title": "Group",
+      "description": "Community group (public or private).",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "description": { "type": "string", "maxLength": 600 },
+        "coverUrl": { "type": "string", "maxLength": 1000 },
+        "privacy": { "type": "string", "enum": ["public", "private"] },
+        "ownerUid": { "type": "string", "maxLength": 128 },
+        "membersCount": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "privacy", "ownerUid", "createdAt"]
+    },
+    "GroupMember": {
+      "title": "GroupMember",
+      "description": "Membership record inside a group.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "displayName": { "type": "string", "maxLength": 80 },
+        "avatarUrl": { "type": "string", "maxLength": 1000 },
+        "role": { "type": "string", "enum": ["owner", "moderator", "member"] },
+        "status": { "type": "string", "enum": ["active", "pending"] },
+        "joinedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "displayName", "role", "status", "joinedAt"]
+    },
+    "Page": {
+      "title": "Page",
+      "description": "Personal or business public page.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "category": { "type": "string", "maxLength": 60 },
+        "description": { "type": "string", "maxLength": 600 },
+        "avatarUrl": { "type": "string", "maxLength": 1000 },
+        "coverUrl": { "type": "string", "maxLength": 1000 },
+        "ownerUid": { "type": "string", "maxLength": 128 },
+        "followersCount": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "category", "ownerUid", "createdAt"]
+    },
+    "PageFollower": {
+      "title": "PageFollower",
+      "description": "User following a page.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "followedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "followedAt"]
+    },
+    "Chat": {
+      "title": "Chat",
+      "description": "Direct or group chat conversation.",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["direct", "group"] },
+        "name": { "type": "string", "maxLength": 100 },
+        "ownerUid": { "type": "string", "maxLength": 128 },
+        "participantUids": { "type": "array" },
+        "lastMessageText": { "type": "string", "maxLength": 400 },
+        "lastMessageSenderUid": { "type": "string", "maxLength": 128 },
+        "e2eeEnabled": { "type": "boolean" },
+        "pinnedBy": { "type": "array" },
+        "archivedBy": { "type": "array" },
+        "mutedBy": { "type": "array" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["type", "ownerUid", "participantUids", "createdAt"]
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "Individual message inside a chat.",
+      "type": "object",
+      "properties": {
+        "chatId": { "type": "string", "maxLength": 128 },
+        "senderUid": { "type": "string", "maxLength": 128 },
+        "senderName": { "type": "string", "maxLength": 80 },
+        "participantUids": { "type": "array" },
+        "text": { "type": "string", "maxLength": 4000 },
+        "mediaUrl": { "type": "string", "maxLength": 1000 },
+        "mediaType": { "type": "string", "maxLength": 64 },
+        "fileName": { "type": "string", "maxLength": 200 },
+        "location": { "type": "string", "maxLength": 160 },
+        "replyToId": { "type": "string", "maxLength": 128 },
+        "replyToPreview": { "type": "string", "maxLength": 180 },
+        "isForwarded": { "type": "boolean" },
+        "isEdited": { "type": "boolean" },
+        "isDeleted": { "type": "boolean" },
+        "reaction": { "type": "string", "maxLength": 32 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["chatId", "senderUid", "senderName", "participantUids", "text", "createdAt"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "User notification event.",
+      "type": "object",
+      "properties": {
+        "recipientUid": { "type": "string", "maxLength": 128 },
+        "actorUid": { "type": "string", "maxLength": 128 },
+        "actorName": { "type": "string", "maxLength": 80 },
+        "type": { "type": "string", "enum": ["message", "friend_request", "like", "comment", "share", "mention", "follow", "group", "page", "file_share", "live"] },
+        "targetId": { "type": "string", "maxLength": 128 },
+        "message": { "type": "string", "maxLength": 300 },
+        "isRead": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["recipientUid", "actorUid", "actorName", "type", "message", "isRead", "createdAt"]
+    },
+    "CloudFolder": {
+      "title": "CloudFolder",
+      "description": "Cloud storage folder owned by a user.",
+      "type": "object",
+      "properties": {
+        "ownerUid": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "parentId": { "type": "string", "maxLength": 128 },
+        "isTrashed": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ownerUid", "name", "isTrashed", "createdAt"]
+    },
+    "CloudFile": {
+      "title": "CloudFile",
+      "description": "Uploaded cloud file metadata linked to real server storage.",
+      "type": "object",
+      "properties": {
+        "ownerUid": { "type": "string", "maxLength": 128 },
+        "folderId": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "mimeType": { "type": "string", "maxLength": 120 },
+        "sizeBytes": { "type": "number" },
+        "storageKey": { "type": "string", "maxLength": 256 },
+        "downloadUrl": { "type": "string", "maxLength": 1000 },
+        "isTrashed": { "type": "boolean" },
+        "shareToken": { "type": "string", "maxLength": 128 },
+        "shareAccess": { "type": "string", "enum": ["private", "link_view", "link_edit"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ownerUid", "name", "mimeType", "sizeBytes", "storageKey", "downloadUrl", "isTrashed", "shareAccess", "createdAt"]
+    },
+    "AiConversation": {
+      "title": "AiConversation",
+      "description": "Saved TIGER AI or TIGER DRIVE AI conversation owned by a user.",
+      "type": "object",
+      "properties": {
+        "ownerUid": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 160 },
+        "mode": { "type": "string", "enum": ["chat", "drive"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ownerUid", "title", "mode", "createdAt"]
+    },
+    "AiMessage": {
+      "title": "AiMessage",
+      "description": "Message inside an AI conversation.",
+      "type": "object",
+      "properties": {
+        "ownerUid": { "type": "string", "maxLength": 128 },
+        "role": { "type": "string", "enum": ["user", "assistant"] },
+        "content": { "type": "string", "maxLength": 20000 },
+        "imageUrl": { "type": "string", "maxLength": 100000 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ownerUid", "role", "content", "createdAt"]
+    },
+    "PaymentRecord": {
+      "title": "PaymentRecord",
+      "description": "Subscription checkout and invoice record.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "plan": { "type": "string", "enum": ["free", "plus", "pro"] },
+        "amountCents": { "type": "number" },
+        "currency": { "type": "string", "maxLength": 8 },
+        "status": { "type": "string", "enum": ["pending_verification", "verified", "cancelled"] },
+        "note": { "type": "string", "maxLength": 300 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "plan", "amountCents", "currency", "status", "createdAt"]
+    },
+    "Report": {
+      "title": "Report",
+      "description": "Content or user moderation report.",
+      "type": "object",
+      "properties": {
+        "reporterUid": { "type": "string", "maxLength": 128 },
+        "targetType": { "type": "string", "enum": ["post", "comment", "user", "live", "file", "group", "page"] },
+        "targetId": { "type": "string", "maxLength": 128 },
+        "reason": { "type": "string", "minLength": 3, "maxLength": 500 },
+        "status": { "type": "string", "enum": ["open", "reviewed", "resolved"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["reporterUid", "targetType", "targetId", "reason", "status", "createdAt"]
+    },
+    "AdminLog": {
+      "title": "AdminLog",
+      "description": "Immutable admin security and moderation audit log.",
+      "type": "object",
+      "properties": {
+        "adminUid": { "type": "string", "maxLength": 128 },
+        "action": { "type": "string", "maxLength": 120 },
+        "targetType": { "type": "string", "maxLength": 64 },
+        "targetId": { "type": "string", "maxLength": 128 },
+        "details": { "type": "string", "maxLength": 600 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["adminUid", "action", "targetType", "targetId", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": { "schema": { "$ref": "#/entities/UserAccount" }, "description": "Private user account, quota, and PII settings." },
+    "/publicProfiles/{userId}": { "schema": { "$ref": "#/entities/PublicProfile" }, "description": "Public social profiles discoverable by signed-in users." },
+    "/admins/{adminId}": { "schema": { "$ref": "#/entities/UserAccount" }, "description": "Admin role registry." },
+    "/friendRequests/{requestId}": { "schema": { "$ref": "#/entities/FriendRequest" }, "description": "Friend requests." },
+    "/friendships/{friendshipId}": { "schema": { "$ref": "#/entities/Friendship" }, "description": "Active mutual friendships." },
+    "/follows/{followId}": { "schema": { "$ref": "#/entities/Follow" }, "description": "User follow relationships." },
+    "/blocks/{blockId}": { "schema": { "$ref": "#/entities/Block" }, "description": "Blocked user records." },
+    "/posts/{postId}": { "schema": { "$ref": "#/entities/Post" }, "description": "Social feed posts." },
+    "/posts/{postId}/comments/{commentId}": { "schema": { "$ref": "#/entities/Comment" }, "description": "Post comments and replies." },
+    "/posts/{postId}/reactions/{userId}": { "schema": { "$ref": "#/entities/PostReaction" }, "description": "User reactions on posts." },
+    "/savedPosts/{saveId}": { "schema": { "$ref": "#/entities/SavedPost" }, "description": "Bookmarked posts per user." },
+    "/stories/{storyId}": { "schema": { "$ref": "#/entities/Story" }, "description": "24-hour user stories." },
+    "/stories/{storyId}/views/{viewerId}": { "schema": { "$ref": "#/entities/StoryView" }, "description": "Story viewer records." },
+    "/reels/{reelId}": { "schema": { "$ref": "#/entities/Reel" }, "description": "Short vertical reels." },
+    "/liveStreams/{streamId}": { "schema": { "$ref": "#/entities/LiveStream" }, "description": "Live broadcast rooms." },
+    "/groups/{groupId}": { "schema": { "$ref": "#/entities/Group" }, "description": "User groups." },
+    "/groups/{groupId}/members/{memberId}": { "schema": { "$ref": "#/entities/GroupMember" }, "description": "Group memberships." },
+    "/pages/{pageId}": { "schema": { "$ref": "#/entities/Page" }, "description": "Personal and business pages." },
+    "/pages/{pageId}/followers/{followerId}": { "schema": { "$ref": "#/entities/PageFollower" }, "description": "Page followers." },
+    "/chats/{chatId}": { "schema": { "$ref": "#/entities/Chat" }, "description": "Direct and group chats." },
+    "/chats/{chatId}/messages/{messageId}": { "schema": { "$ref": "#/entities/ChatMessage" }, "description": "Messages inside a chat." },
+    "/notifications/{notifId}": { "schema": { "$ref": "#/entities/Notification" }, "description": "User notifications." },
+    "/cloudFolders/{folderId}": { "schema": { "$ref": "#/entities/CloudFolder" }, "description": "Cloud folders per user." },
+    "/cloudFiles/{fileId}": { "schema": { "$ref": "#/entities/CloudFile" }, "description": "Cloud file metadata per user." },
+    "/aiConversations/{convId}": { "schema": { "$ref": "#/entities/AiConversation" }, "description": "Saved AI conversations." },
+    "/aiConversations/{convId}/messages/{msgId}": { "schema": { "$ref": "#/entities/AiMessage" }, "description": "AI conversation messages." },
+    "/payments/{paymentId}": { "schema": { "$ref": "#/entities/PaymentRecord" }, "description": "Subscription invoices and payment verification records." },
+    "/reports/{reportId}": { "schema": { "$ref": "#/entities/Report" }, "description": "Moderation reports." },
+    "/adminLogs/{logId}": { "schema": { "$ref": "#/entities/AdminLog" }, "description": "Immutable admin audit trail." }
+  }
+}

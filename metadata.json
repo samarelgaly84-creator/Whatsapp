@@ -1,0 +1,6 @@
+{
+  "name": "TIGER",
+  "description": "TIGER — Connect. Share. Create. Store. Discover. Unified Social Network, Real-Time Chat, Cloud Storage, Short Reels, Live Streaming, and AI Workspace.",
+  "requestFramePermissions": ["camera", "microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
